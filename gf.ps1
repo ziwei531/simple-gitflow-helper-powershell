@@ -164,9 +164,27 @@ elseif ($command -eq "release" -and $action -eq "finish") {
     Write-Host "Pushing stable branch and tags to origin..." -ForegroundColor Cyan
     git push origin stable --tags
     
+    Write-Host "Deleting local release branch '$currentBranch'..." -ForegroundColor Cyan
     git branch -d $currentBranch
     
-    Write-Host "Success: Release $version merged to stable, tagged as v$version, pushed to origin, and local branch deleted." -ForegroundColor Green
+    Write-Host "Deleting remote release branch 'origin/$currentBranch'..." -ForegroundColor Cyan
+    git push origin --delete $currentBranch
+
+    # Clean up remote feature branches
+    $remoteFeatures = git branch -r --list "origin/feature-*" | ForEach-Object { $_.Trim() }
+    if ($remoteFeatures.Count -gt 0) {
+        Write-Host "Cleaning up remote feature branches..." -ForegroundColor Cyan
+        foreach ($rf in $remoteFeatures) {
+            $bareName = $rf -replace '^origin/', ''
+            Write-Host "  Deleting remote '$rf'..." -ForegroundColor DarkGray
+            git push origin --delete $bareName
+        }
+        Write-Host "All remote feature branches deleted." -ForegroundColor Green
+    } else {
+        Write-Host "No remote feature branches to clean up." -ForegroundColor DarkGray
+    }
+
+    Write-Host "Success: Release $version merged to stable, tagged as v$version, pushed, and branches cleaned up." -ForegroundColor Green
     exit 0
 }
 elseif ($command -eq "hotfix" -and $action -eq "start") {
@@ -221,9 +239,13 @@ elseif ($command -eq "hotfix" -and $action -eq "finish") {
     Write-Host "Pushing stable branch and tags to origin..." -ForegroundColor Cyan
     git push origin stable --tags
 
+    Write-Host "Deleting local hotfix branch '$currentBranch'..." -ForegroundColor Cyan
     git branch -d $currentBranch
+
+    Write-Host "Deleting remote hotfix branch 'origin/$currentBranch'..." -ForegroundColor Cyan
+    git push origin --delete $currentBranch
     
-    Write-Host "Success: Hotfix $version merged to stable, tagged as v$version, pushed to origin, and local branch deleted." -ForegroundColor Green
+    Write-Host "Success: Hotfix $version merged to stable, tagged as v$version, pushed, and branches cleaned up." -ForegroundColor Green
     exit 0
 }
 else {
