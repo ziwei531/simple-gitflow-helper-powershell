@@ -93,6 +93,7 @@ gf hotfix start
 | `gf release start --major` | Create `release-X.Y.Z` from last tag (major bump) |
 | `gf hotfix start` | Create `hotfix-X.Y.Z` from last tag (revision bump) |
 | `gf hotfix finish` | Merge hotfix → `stable`, tag `vX.Y.Z`, delete hotfix branch |
+| `gf clean` | Delete local branches whose remote tracking branch is gone |
 
 ## Branch Model
 
@@ -148,6 +149,12 @@ gf hotfix start                # creates hotfix-0.1.1 from last tag (rev bump fr
 # ... fix bugs, commit ...
 
 gf hotfix finish               # auto: merge → stable, tag v0.1.1, delete branch
+```
+
+### Clean
+
+```powershell
+gf clean                       # prune remote refs, then list & delete stale local branches
 ```
 
 ## Requirements

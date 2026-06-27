@@ -185,6 +185,9 @@ elseif ($command -eq "release" -and $action -eq "finish") {
     }
 
     Write-Host "Success: Release $version merged to stable, tagged as v$version, pushed, and branches cleaned up." -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Tip: Run 'gf clean' to remove local branches whose remotes have been deleted." -ForegroundColor Green
+    Write-Host "     (Local feature branches are not deleted automatically by convention.)" -ForegroundColor Green
     exit 0
 }
 elseif ($command -eq "hotfix" -and $action -eq "start") {
@@ -248,6 +251,57 @@ elseif ($command -eq "hotfix" -and $action -eq "finish") {
     Write-Host "Success: Hotfix $version merged to stable, tagged as v$version, pushed, and branches cleaned up." -ForegroundColor Green
     exit 0
 }
+elseif ($command -eq "clean") {
+    Write-Host "Fetching and pruning remote references..." -ForegroundColor Cyan
+    git fetch --prune
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Error: git fetch --prune failed." -ForegroundColor Red
+        exit $LASTEXITCODE
+    }
+
+    # Find local branches whose upstream tracking branch is gone
+    $goneBranches = git branch -vv 2>$null | Select-String ': gone]' | ForEach-Object {
+        $line = $_ -replace '^\*?\s+', '' -replace '\s+.*$', ''
+        $line
+    }
+
+    if ($null -eq $goneBranches -or $goneBranches.Count -eq 0) {
+        Write-Host "No stale local branches detected. Everything is clean!" -ForegroundColor Green
+        exit 0
+    }
+
+    Write-Host ""
+    Write-Host "The following local branches have been deleted on remote:" -ForegroundColor Yellow
+    Write-Host ""
+    foreach ($branch in $goneBranches) {
+        Write-Host "  $branch" -ForegroundColor Red
+    }
+    Write-Host ""
+
+    $deletedCount = 0
+    foreach ($branch in $goneBranches) {
+        $confirm = Read-Host "Delete '$branch'? [y/N]"
+        if ($confirm -match '^[Yy]') {
+            Write-Host "  Deleting local branch '$branch'..." -ForegroundColor Cyan
+            git branch -D $branch
+            if ($LASTEXITCODE -eq 0) {
+                $deletedCount++
+            } else {
+                Write-Host "    Warning: Failed to delete '$branch'." -ForegroundColor Yellow
+            }
+        } else {
+            Write-Host "  Skipped '$branch'." -ForegroundColor DarkGray
+        }
+    }
+
+    Write-Host ""
+    if ($deletedCount -gt 0) {
+        Write-Host "Clean complete! Removed $deletedCount stale local branch(es)." -ForegroundColor Green
+    } else {
+        Write-Host "No branches were deleted." -ForegroundColor DarkGray
+    }
+    exit 0
+}
 else {
     # Help Menu
     Write-Host "gf - Simple Gitflow Helper PowerShell" -ForegroundColor Cyan
@@ -260,4 +314,5 @@ else {
     Write-Host "  gf release finish                            Merge current release to stable, tag, push, and delete local branch"
     Write-Host "  gf hotfix start                              Create 'hotfix-X.Y.Z' from last tag (revision bump) and push to origin"
     Write-Host "  gf hotfix finish                             Merge current hotfix to stable, tag, push, and delete local branch"
+    Write-Host "  gf clean                                     Delete local branches whose remote tracking branch is gone"
 }
