@@ -1,4 +1,4 @@
-# gf — Simple Git Workflow Helper
+# gf — Simple Gitflow Helper PowerShell
 
 A lightweight PowerShell script inspired by [twgit](https://github.com/Twenga/twgit), providing a streamlined Git branching workflow for feature, release, and hotfix management.
 
@@ -25,10 +25,10 @@ The script detects existing installations, checks prerequisites, configures your
 
 ```powershell
 # Clone the repository anywhere you like (e.g., your projects folder)
-git clone https://github.com/your-username/simple-twgit.git C:\path\to\simple-twgit
+git clone https://github.com/your-username/simple-gitflow-helper-powershell.git C:\path\to\simple-gitflow-helper-powershell
 ```
 
-Or download `gf.ps1` directly and place it in a folder of your choice (e.g., `C:\Tools\simple-twgit\`).
+Or download `gf.ps1` directly and place it in a folder of your choice (e.g., `C:\Tools\simple-gitflow-helper-powershell\`).
 
 ### Step 2 — Add to Your PowerShell Profile
 
@@ -43,7 +43,7 @@ notepad $PROFILE
 Add the following line (adjust the path to match where you cloned the script):
 
 ```powershell
-function gf { & "C:\path\to\simple-twgit\gf.ps1" @args }
+function gf { & "C:\path\to\simple-gitflow-helper-powershell\gf.ps1" @args }
 ```
 
 Save the file and reload your profile:

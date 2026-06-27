@@ -1,4 +1,4 @@
-# gf.ps1 - Simple Git Workflow Helper
+# gf.ps1 - Simple Gitflow Helper PowerShell
 
 # Mitigate PowerShell ErrorActionPreference conflicts with git's stderr
 $ErrorActionPreference = 'Continue'
@@ -250,7 +250,7 @@ elseif ($command -eq "hotfix" -and $action -eq "finish") {
 }
 else {
     # Help Menu
-    Write-Host "gf - Simple Git Workflow Helper" -ForegroundColor Cyan
+    Write-Host "gf - Simple Gitflow Helper PowerShell" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "Commands:"
     Write-Host "  gf feature start {name}                      Create 'feature-{name}' from 'stable' and push to origin"
