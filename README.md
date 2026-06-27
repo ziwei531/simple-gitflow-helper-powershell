@@ -4,12 +4,24 @@ A lightweight PowerShell script inspired by [twgit](https://github.com/Twenga/tw
 
 ## Installation (Windows)
 
-### Prerequisites
+### Automated Install (recommended)
+
+Run the installer in **PowerShell**:
+
+```powershell
+.\install.ps1
+```
+
+The script detects existing installations, checks prerequisites, configures your PowerShell profile, and sets the execution policy — all interactively.
+
+### Manual Install
+
+#### Prerequisites
 
 - **Git** — installed and available on your `PATH` ([download](https://git-scm.com/download/win))
 - **PowerShell 5.1+** — included with Windows 10/11
 
-### Step 1 — Clone or Download
+#### Step 1 — Clone or Download
 
 ```powershell
 # Clone the repository anywhere you like (e.g., your projects folder)
