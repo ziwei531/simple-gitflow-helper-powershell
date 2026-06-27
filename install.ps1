@@ -1,6 +1,6 @@
 <# 
 .SYNOPSIS
-    Install gf (Simple Git Workflow Helper) on Windows
+    Install gf (Simple Gitflow Helper PowerShell) on Windows
 .DESCRIPTION
     Detects existing installations, checks prerequisites, configures your
     PowerShell profile, and sets the execution policy — all interactively.
@@ -9,7 +9,7 @@
 $ErrorActionPreference = 'Stop'
 
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "   gf - Simple Git Workflow Helper Installer" -ForegroundColor Cyan
+Write-Host "   gf - Simple Gitflow Helper PowerShell Installer" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -74,7 +74,7 @@ $gfScript = Join-Path $scriptDir "gf.ps1"
 
 if (-not (Test-Path $gfScript)) {
     Write-Host "  ERROR: gf.ps1 not found at $gfScript" -ForegroundColor Red
-    Write-Host "  Make sure you run this script from the simple-twgit directory."
+    Write-Host "  Make sure you run this script from the simple-gitflow-helper-powershell directory."
     exit 1
 }
 Write-Host "  $([char]0x2713) gf.ps1 found at: $gfScript" -ForegroundColor Green
@@ -104,7 +104,7 @@ if (Test-Path $PROFILE) {
 # Append the gf function
 $newContent = $content
 if ($newContent) { $newContent += "`r`n`r`n" }
-$newContent += '# gf - Simple Git Workflow Helper (auto-installed)' + "`r`n"
+$newContent += '# gf - Simple Gitflow Helper PowerShell (auto-installed)' + "`r`n"
 $newContent += "function gf { & `"$gfScript`" @args }" + "`r`n"
 
 Set-Content -Path $PROFILE -Value $newContent -Encoding UTF8
