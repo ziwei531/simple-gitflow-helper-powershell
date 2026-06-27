@@ -2,17 +2,86 @@
 
 A lightweight PowerShell script inspired by [twgit](https://github.com/Twenga/twgit), providing a streamlined Git branching workflow for feature, release, and hotfix management.
 
+## Installation (Windows)
+
+### Automated Install (recommended)
+
+Run the installer in **PowerShell**:
+
+```powershell
+.\install.ps1
+```
+
+The script detects existing installations, checks prerequisites, configures your PowerShell profile, and sets the execution policy — all interactively.
+
+### Manual Install
+
+#### Prerequisites
+
+- **Git** — installed and available on your `PATH` ([download](https://git-scm.com/download/win))
+- **PowerShell 5.1+** — included with Windows 10/11
+
+#### Step 1 — Clone or Download
+
+```powershell
+# Clone the repository anywhere you like (e.g., your projects folder)
+git clone https://github.com/your-username/simple-twgit.git C:\path\to\simple-twgit
+```
+
+Or download `gf.ps1` directly and place it in a folder of your choice (e.g., `C:\Tools\simple-twgit\`).
+
+### Step 2 — Add to Your PowerShell Profile
+
+Edit your PowerShell profile to make `gf` available in every session:
+
+```powershell
+# Open your profile (creates it if it doesn't exist)
+if (!(Test-Path $PROFILE)) { New-Item -Path $PROFILE -ItemType File -Force }
+notepad $PROFILE
+```
+
+Add the following line (adjust the path to match where you cloned the script):
+
+```powershell
+function gf { & "C:\path\to\simple-twgit\gf.ps1" @args }
+```
+
+Save the file and reload your profile:
+
+```powershell
+. $PROFILE
+```
+
+### Step 3 — Allow Script Execution
+
+PowerShell restricts script execution by default. Set the execution policy **once per machine**:
+
+```powershell
+# Run PowerShell as Administrator, then:
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+Alternatively, relax it only for the current session (must repeat each time you open PowerShell):
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+```
+
+### Step 4 — Verify
+
+```powershell
+gf feature start my-feature
+```
+
+If a new branch `feature-my-feature` is created from `stable`, the installation is complete.
+
 ## Quick Start
 
 ```powershell
-# One-time session setup
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
-
-# Add to your PowerShell profile ($PROFILE)
-function gf { & "E:\Projects\simple-twgit\gf.ps1" @args }
-
-# Now use from anywhere
+# After installation, use from any directory:
 gf feature start my-feature
+gf release start
+gf hotfix start
 ```
 
 ## Commands
