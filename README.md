@@ -91,9 +91,3 @@ gf hotfix finish               # auto: merge → stable, tag v0.1.1, delete bran
 
 - PowerShell `$ErrorActionPreference` conflicts with git's stderr output — the script uses `"Continue"` internally, but the calling session may interfere
 - Execution policy may need to be relaxed per session
-
-## License
-
-MIT
-
-test test
