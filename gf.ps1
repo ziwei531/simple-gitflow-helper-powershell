@@ -93,7 +93,8 @@ elseif ($command -eq "feature" -and $action -eq "merge-into-release") {
     git checkout $releaseBranch
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-    git merge --no-ff $currentBranch
+    # Auto-commit message added here to skip the interactive editor
+    git merge --no-ff -m "Merge branch '$currentBranch' into $releaseBranch" $currentBranch
     if ($LASTEXITCODE -ne 0) {
         Write-Host "Merge conflict or error occurred. Please resolve manually, commit, and push." -ForegroundColor Yellow
         exit $LASTEXITCODE
@@ -151,7 +152,8 @@ elseif ($command -eq "release" -and $action -eq "finish") {
     git checkout stable
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-    git merge --no-ff $currentBranch
+    # Auto-commit message added here
+    git merge --no-ff -m "Merge release '$version' into stable" $currentBranch
     if ($LASTEXITCODE -ne 0) {
         Write-Host "Merge conflict or error occurred. Please resolve manually, commit, and then tag/delete the branch yourself." -ForegroundColor Yellow
         exit $LASTEXITCODE
@@ -207,7 +209,8 @@ elseif ($command -eq "hotfix" -and $action -eq "finish") {
     git checkout stable
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-    git merge --no-ff $currentBranch
+    # Auto-commit message added here
+    git merge --no-ff -m "Merge hotfix '$version' into stable" $currentBranch
     if ($LASTEXITCODE -ne 0) {
         Write-Host "Merge conflict or error occurred. Please resolve manually, commit, and then tag/delete the branch yourself." -ForegroundColor Yellow
         exit $LASTEXITCODE
@@ -229,7 +232,7 @@ else {
     Write-Host ""
     Write-Host "Commands:"
     Write-Host "  gf feature start {name}                      Create 'feature-{name}' from 'stable' and push to origin"
-    Write-Host "  gf feature merge-into-release {version}      Merge current feature into 'release-{version}' and push to origin"
+    Write-Host "  gf feature merge-into-release [version]      Merge feature into active release branch and push"
     Write-Host "  gf release start                             Create 'release-X.Y.Z' from last tag and push to origin"
     Write-Host "  gf release start --major                     Create 'release-X.Y.Z' from last tag (major bump) and push to origin"
     Write-Host "  gf release finish                            Merge current release to stable, tag, push, and delete local branch"
