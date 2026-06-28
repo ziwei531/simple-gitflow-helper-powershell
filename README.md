@@ -88,9 +88,12 @@ gf hotfix start
 
 | Command | Description |
 |---------|-------------|
-| `gf feature start {name}` | Create `feature-{name}` from `stable` |
+| `gf feature start {name}` | Create `feature-{name}` from `stable` and push to origin |
+| `gf feature remove {name}` | Delete local and remote `feature-{name}` branch |
+| `gf feature merge-into-release [version]` | Merge current feature into a release branch and push |
 | `gf release start` | Create `release-X.Y.Z` from last tag (minor bump) |
 | `gf release start --major` | Create `release-X.Y.Z` from last tag (major bump) |
+| `gf release finish` | Merge release → `stable`, tag `vX.Y.Z`, delete release branch |
 | `gf hotfix start` | Create `hotfix-X.Y.Z` from last tag (revision bump) |
 | `gf hotfix finish` | Merge hotfix → `stable`, tag `vX.Y.Z`, delete hotfix branch |
 | `gf clean` | Delete local branches whose remote tracking branch is gone |
@@ -125,9 +128,10 @@ When no tags exist, the first release/hotfix starts at `0.1.0`.
 ```powershell
 gf feature start login-page    # creates feature-login-page from stable
 # ... make changes, commit ...
-git checkout stable
-git merge --no-ff feature-login-page
-git branch -d feature-login-page
+gf feature merge-into-release  # merges into latest active release branch
+
+# Or, to discard a feature entirely:
+gf feature remove login-page   # deletes local and remote feature-login-page
 ```
 
 ### Release
