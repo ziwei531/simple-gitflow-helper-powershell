@@ -47,8 +47,16 @@ if ($command -eq "feature" -and $action -eq "start") {
         exit 1
     }
 
-    $branchName = "feature-$targetName"
-    Write-Host "Starting feature '$targetName'..." -ForegroundColor Cyan
+    # Auto-detect: if name already has 'feature-' prefix, use as-is; otherwise prefix it
+    if ($targetName -match '^feature-(.+)$') {
+        $branchName = $targetName
+        $bareName = $matches[1]
+    } else {
+        $branchName = "feature-$targetName"
+        $bareName = $targetName
+    }
+
+    Write-Host "Starting feature '$bareName'..." -ForegroundColor Cyan
     
     git checkout -b $branchName stable
     
@@ -58,6 +66,53 @@ if ($command -eq "feature" -and $action -eq "start") {
     }
     
     exit $LASTEXITCODE
+}
+elseif ($command -eq "feature" -and $action -eq "remove") {
+    if ([string]::IsNullOrWhiteSpace($targetName)) {
+        Write-Host "Error: Feature name is required. Usage: gf feature remove <name>" -ForegroundColor Red
+        exit 1
+    }
+
+    # Auto-detect: if name already has 'feature-' prefix, use as-is; otherwise prefix it
+    if ($targetName -match '^feature-(.+)$') {
+        $branchName = $targetName
+        $bareName = $matches[1]
+    } else {
+        $branchName = "feature-$targetName"
+        $bareName = $targetName
+    }
+
+    # Verify local branch exists
+    git rev-parse --verify $branchName >$null 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Error: Local branch '$branchName' does not exist." -ForegroundColor Red
+        exit 1
+    }
+
+    # If currently on the feature branch, switch to stable first
+    $currentBranch = git rev-parse --abbrev-ref HEAD
+    if ($currentBranch -eq $branchName) {
+        Write-Host "Switching off '$branchName' to 'stable'..." -ForegroundColor Cyan
+        git checkout stable
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
+
+    Write-Host "Removing feature '$bareName'..." -ForegroundColor Cyan
+
+    Write-Host "Deleting local branch '$branchName'..." -ForegroundColor Cyan
+    git branch -D $branchName
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Warning: Failed to delete local branch '$branchName'." -ForegroundColor Yellow
+    }
+
+    Write-Host "Deleting remote branch 'origin/$branchName'..." -ForegroundColor Cyan
+    git push origin --delete $branchName 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Warning: Remote branch 'origin/$branchName' may not exist or could not be deleted." -ForegroundColor Yellow
+    }
+
+    Write-Host "Success: Feature '$bareName' removed (local and remote)." -ForegroundColor Green
+    exit 0
 }
 elseif ($command -eq "feature" -and $action -eq "merge-into-release") {
     $currentBranch = git rev-parse --abbrev-ref HEAD
@@ -308,6 +363,7 @@ else {
     Write-Host ""
     Write-Host "Commands:"
     Write-Host "  gf feature start {name}                      Create 'feature-{name}' from 'stable' and push to origin"
+    Write-Host "  gf feature remove {name}                     Delete local and remote 'feature-{name}' branches"
     Write-Host "  gf feature merge-into-release [version]      Merge feature into active release branch and push"
     Write-Host "  gf release start                             Create 'release-X.Y.Z' from last tag and push to origin"
     Write-Host "  gf release start --major                     Create 'release-X.Y.Z' from last tag (major bump) and push to origin"
